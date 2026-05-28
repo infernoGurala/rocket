@@ -1,1 +1,396 @@
-niggggg
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Serif+Display:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Libre Baskerville',serif;background:#1a1a1a;color:#e8e0d4;padding:10px;}
+  #app{width:100%;max-width:900px;margin:0 auto;}
+  #input-panel{padding:1.5rem 1rem;}
+  #input-panel h2{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:#e8e0d4;margin-bottom:.4rem;}
+  #input-panel p{font-size:13px;color:#888;margin-bottom:1.2rem;font-family:sans-serif;}
+  #raw-text{width:100%;min-height:180px;border:.5px solid #444;border-radius:8px;padding:12px 14px;font-size:15px;font-family:sans-serif;color:#e8e0d4;background:#2a2a2a;resize:vertical;line-height:1.6;}
+  #raw-text:focus{outline:none;border-color:#666;}
+  .mode-toggle{display:flex;gap:0;margin-bottom:1.2rem;border:.5px solid #444;border-radius:8px;overflow:hidden;width:fit-content;}
+  .mode-btn{padding:10px 20px;font-size:13px;font-family:sans-serif;border:none;background:#2a2a2a;color:#888;cursor:pointer;transition:background .12s,color .12s;}
+  .mode-btn.active{background:#e8e0d4;color:#1a1a1a;}
+  .mode-btn:not(:last-child){border-right:.5px solid #444;}
+  .btn-row{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap;align-items:center;}
+  .btn-primary{padding:12px 28px;background:#e8e0d4;color:#1a1a1a;border:none;border-radius:8px;font-size:15px;font-weight:bold;font-family:sans-serif;cursor:pointer;transition:opacity .15s;}
+  .btn-primary:hover{opacity:.8;}
+  .btn-secondary{padding:12px 20px;background:#2a2a2a;color:#e8e0d4;border:.5px solid #444;border-radius:8px;font-size:14px;font-family:sans-serif;cursor:pointer;}
+  .btn-secondary:hover{background:#333;}
+  #fix-status{font-size:13px;font-family:sans-serif;color:#c8622a;opacity:0;transition:opacity .4s;}
+  #fix-status.show{opacity:1;}
+  #player-panel{display:none;}
+  #stage{width:100%;min-height:300px;background:#f2ede4;display:flex;flex-direction:column;justify-content:flex-end;padding:2rem 1.5rem 2.5rem;position:relative;overflow:hidden;border-radius:8px 8px 0 0;}
+  #loading-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:inherit;opacity:0;pointer-events:none;transition:opacity .25s;}
+  #loading-overlay.show{opacity:1;pointer-events:all;}
+  .loading-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#c8622a;margin:0 3px;animation:bounce 1.1s infinite;}
+  .loading-dot:nth-child(2){animation-delay:.18s;}
+  .loading-dot:nth-child(3){animation-delay:.36s;}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-8px);}}
+  #prev-line{font-family:'Libre Baskerville',serif;font-size:15px;font-style:italic;color:#2a2520;opacity:0.25;line-height:1.5;margin-bottom:1.2rem;min-height:22px;pointer-events:none;}
+  #curr-line{font-size:24px;line-height:1.4;color:#2a2520;opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease;}
+  #curr-line.visible{opacity:1;transform:translateY(0);}
+  .w-plain{font-family:'Libre Baskerville',serif;color:#2a2520;}
+  .w-key{font-family:'DM Serif Display',serif;font-style:italic;color:#c8622a;}
+  .w-strong{font-family:'Playfair Display',serif;font-weight:700;color:#2a2520;}
+  .w-term{font-family:'Playfair Display',serif;font-weight:700;color:#c87d0a;}
+  .word-token{display:inline;opacity:0;transition:opacity .12s ease;}
+  .word-token.revealed{opacity:1;}
+  .word-token.active-word{color:#c8622a !important;font-style:normal;}
+  #progress-bar-wrap{height:4px;background:#333;width:100%;}
+  #progress-bar{height:100%;background:#c8622a;transition:width .3s ease;width:0%;}
+  
+  /* Mobile Responsive Controls Layout */
+  #controls{display:flex;flex-direction:column;gap:12px;padding:1.2rem 1rem;background:#222;border-radius:0 0 8px 8px;}
+  .ctrl-row-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;}
+  .ctrl-buttons-group{display:flex;gap:6px;flex-grow:1;}
+  .ctrl-btn{flex:1;text-align:center;padding:10px 8px;border:.5px solid #444;background:#2a2a2a;border-radius:8px;font-size:13px;font-family:sans-serif;color:#e8e0d4;cursor:pointer;transition:background .12s;}
+  .ctrl-btn:hover{background:#333;}
+  .ctrl-btn.active{background:#e8e0d4;color:#1a1a1a;border-color:transparent;}
+  #slide-counter{font-size:13px;font-family:sans-serif;color:#888;min-width:45px;text-align:right;}
+  .ctrl-row-bottom{display:flex;flex-wrap:wrap;align-items:center;gap:12px;width:100%;border-top:1px solid #2d2d2d;padding-top:10px;}
+  .ctrl-group{display:flex;align-items:center;gap:6px;font-size:13px;font-family:sans-serif;color:#888;flex-grow:1;}
+  select.ctrl-select{flex-grow:1;min-width:100px;padding:8px;border:.5px solid #444;border-radius:8px;font-size:13px;font-family:sans-serif;background:#2a2a2a;color:#e8e0d4;cursor:pointer;}
+  #back-btn{margin:.5rem 0.5rem 0.8rem;font-size:14px;font-family:sans-serif;color:#aaa;cursor:pointer;background:none;border:none;padding:5px 0;text-decoration:underline;text-underline-offset:4px;display:inline-block;}
+  #back-btn:hover{color:#e8e0d4;}
+  #err-bar{display:none;padding:8px 1rem;font-size:12px;font-family:sans-serif;color:#991b1b;background:#fef2f2;border:.5px solid #fca5a5;border-radius:4px;margin-bottom:8px;}
+
+  @media(min-width: 600px) {
+    #stage { min-height: 360px; padding: 2.5rem 3.5rem 3rem; }
+    #curr-line { font-size: 28px; }
+    #prev-line { font-size: 17px; }
+    #controls { flex-direction: row; flex-wrap: wrap; padding: .9rem 1.5rem; }
+    .ctrl-row-top { width: auto; justify-content: flex-start; flex-grow: unset; }
+    .ctrl-buttons-group { flex-grow: unset; }
+    .ctrl-btn { flex: unset; padding: 7px 14px; }
+    .ctrl-row-bottom { width: auto; border-top: none; padding-top: 0; flex-grow: 1; justify-content: flex-end; }
+    .ctrl-group { flex-grow: unset; }
+    select.ctrl-select { flex-grow: unset; }
+    #slide-counter { margin-left: auto; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="input-panel">
+    <h2>Paste your text to learn</h2>
+    <p>Using Local Browser Audio Engine (Universal TTS)</p>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-full" onclick="setMode('full')">Full Sentence</button>
+      <button class="mode-btn" id="mode-word" onclick="setMode('word')">Word by Word</button>
+    </div>
+    <textarea id="raw-text" placeholder="Paste notes, lectures, or any text..."></textarea>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="fixSentences()">✦ Fix Sentences</button>
+      <button class="btn-primary" onclick="buildSlides()">Generate →</button>
+      <span id="fix-status">Fixed!</span>
+    </div>
+  </div>
+
+  <div id="player-panel">
+    <button id="back-btn" onclick="resetToInput()">← Edit text</button>
+    <div id="err-bar"></div>
+    <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+    <div id="stage">
+      <div id="loading-overlay"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>
+      <div id="prev-line"></div>
+      <div id="curr-line"></div>
+    </div>
+    <div id="controls">
+      <div class="ctrl-row-top">
+        <div class="ctrl-buttons-group">
+          <button class="ctrl-btn" onclick="prevSlide()">← Prev</button>
+          <button class="ctrl-btn active" id="play-btn" onclick="togglePlay()">⏸ Pause</button>
+          <button class="ctrl-btn" onclick="nextSlide()">Next →</button>
+          <button class="ctrl-btn" style="color: #c8622a;" onclick="restartPresentation()">↻ Restart</button>
+        </div>
+        <span id="slide-counter">1 / 1</span>
+      </div>
+      
+      <div class="ctrl-row-bottom">
+        <div class="ctrl-group">Speed:
+          <select class="ctrl-select" id="speed-sel" onchange="updateSpeed(this.value)">
+            <option value="0.8">0.8×</option>
+            <option value="0.9">0.9×</option>
+            <option value="1" selected>1×</option>
+            <option value="1.1">1.1×</option>
+            <option value="1.2">1.2×</option>
+          </select>
+        </div>
+        <div class="ctrl-group">Voice:
+          <select class="ctrl-select" id="voice-sel" onchange="updateVoice()"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let slides=[],current=0,playing=true,speed=1;
+let revealMode='full';
+let wordTimers=[],prevText='',loadingSlide=false;
+let currentUtterance=null;
+let systemVoices=[];
+let selectedVoiceIndex=0;
+
+function setMode(m){
+  revealMode=m;
+  document.getElementById('mode-full').classList.toggle('active',m==='full');
+  document.getElementById('mode-word').classList.toggle('active',m==='word');
+}
+
+function loadVoices() {
+  if (typeof speechSynthesis === 'undefined') return;
+  systemVoices = speechSynthesis.getVoices();
+  const voiceSelect = document.getElementById('voice-sel');
+  if(!voiceSelect) return;
+  
+  voiceSelect.innerHTML = '';
+  if(systemVoices.length === 0) {
+    const opt = document.createElement('option');
+    opt.textContent = "Default System Voice";
+    voiceSelect.appendChild(opt);
+    return;
+  }
+
+  systemVoices.forEach((voice, i) => {
+    const option = document.createElement('option');
+    option.value = i;
+    let displayName = `${voice.name} (${voice.lang})`;
+    if(voice.localService) displayName += ' [Local]';
+    option.textContent = displayName;
+    
+    if(voice.default || voice.lang.includes('en-US') || voice.lang.includes('en_US')) {
+      if(selectedVoiceIndex === 0) selectedVoiceIndex = i;
+    }
+    voiceSelect.appendChild(option);
+  });
+  voiceSelect.value = selectedVoiceIndex;
+}
+
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function updateVoice(){
+  selectedVoiceIndex = parseInt(document.getElementById('voice-sel').value) || 0;
+  if(playing) {
+    showSlide(current);
+  }
+}
+
+function updateSpeed(v){
+  speed=parseFloat(v);
+  if(playing && currentUtterance) {
+    showSlide(current);
+  }
+}
+
+function fixSentences(){
+  const ta=document.getElementById('raw-text');
+  let text=ta.value.replace(/\r\n/g,'\n');
+  const lines=text.split('\n');const joined=[];let buffer='';
+  for(let i=0;i<lines.length;i++){const line=lines[i].trim();if(!line){if(buffer){joined.push(buffer);buffer='';}joined.push('');continue;}buffer=buffer?buffer+' '+line:line;if(/[.!?]$/.test(line)){joined.push(buffer);buffer='';}}
+  if(buffer)joined.push(buffer);
+  const final=joined.join('\n').replace(/\n{3,}/g,'\n\n').trim().split('\n').map(p=>{if(!p.trim())return '';return p.split(/(?<=[.!?])\s+/).join('\n');}).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+  ta.value=final;
+  const st=document.getElementById('fix-status');st.classList.add('show');setTimeout(()=>st.classList.remove('show'),2500);
+}
+
+const stopWords=new Set(['a','an','the','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','it','its','this','that','these','those','i','we','you','he','she','they','me','us','him','her','them','my','our','your','his','their','what','which','who','whom','whose','when','where','why','how','all','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','just','but','and','or','for','of','to','in','on','at','by','as','with','from','up','about','into','through','during','before','after','above','below','between','out','off','over','under','then','once','here','there','any','also','if','although','because','since','while','though']);
+function keyScore(w){const c=w.toLowerCase().replace(/[^a-z]/g,'');if(c.length<=2||stopWords.has(c))return 0;if(c.length>=8)return 3;if(c.length>=5)return 2;return 1;}
+function classifyWord(word,lineWords,idx){
+  const w=word.toLowerCase().replace(/[^a-z]/g,'');
+  if(w.length<=2||stopWords.has(w))return 'w-plain';
+  if(idx>0&&word[0]===word[0].toUpperCase()&&/[A-Z]/.test(word[0]))return 'w-term';
+  const scored=lineWords.map((lw,i)=>({i,s:keyScore(lw)})).filter(x=>x.s>0);
+  if(!scored.length)return 'w-plain';
+  scored.sort((a,b)=>b.s-a.s);
+  const topN=Math.max(1,Math.ceil(scored.length*.35));
+  const topIdx=new Set(scored.slice(0,topN).map(x=>x.i));
+  if(topIdx.has(idx))return keyScore(word)>=3?'w-key':'w-strong';
+  return 'w-plain';
+}
+
+function getCleanWords(text) {
+  return text.trim().split(/\s+/).filter(w => w.length > 0);
+}
+
+function renderFull(text){
+  const words=getCleanWords(text);
+  return words.map((w,i)=>`<span class="${classifyWord(w,words,i)}">${w}</span>`).join(' ');
+}
+function renderWordByWord(text){
+  const words=getCleanWords(text);
+  return words.map((w,i)=>`<span class="word-token ${classifyWord(w,words,i)}" id="wt${i}">${w}</span>`).join(' ');
+}
+function parseText(raw){const result=[];raw.split(/\n+/).map(l=>l.trim()).filter(l=>l.length>1).forEach(line=>{line.split(/(?<=[.!?])\s+/).forEach(s=>{const t=s.trim();if(t.length>1)result.push({text:t});});});return result;}
+
+function showErr(msg){const b=document.getElementById('err-bar');b.textContent=msg;b.style.display='block';setTimeout(()=>b.style.display='none',7000);}
+function setLoading(on){document.getElementById('loading-overlay').classList.toggle('show',on);loadingSlide=on;}
+
+function buildSlides(){
+  const raw=document.getElementById('raw-text').value.trim();if(!raw)return;
+  slides=parseText(raw);if(!slides.length)return;
+  loadVoices();
+  current=0;playing=true;prevText='';
+  document.getElementById('input-panel').style.display='none';
+  document.getElementById('player-panel').style.display='block';
+  showSlide(current);
+}
+
+/* FIX: Timers are only established inside the engine start callback loop */
+function scheduleWordRevealTimed(text){
+  wordTimers.forEach(clearTimeout);wordTimers=[];
+  const words=getCleanWords(text);
+  const n=words.length;
+
+  const weights=words.map(w=>Math.max(0.5,w.replace(/[^a-z]/gi,'').length/4.5));
+  const totalWeight=weights.reduce((a,b)=>a+b,0);
+
+  // Calibrated default text pacing math engine
+  const baseWpm = 150 * speed;
+  const estimatedDurationMs = (n / baseWpm) * 60 * 1000;
+
+  const startOffset=10; 
+  const usable = estimatedDurationMs - startOffset - 20;
+
+  let elapsed=startOffset;
+  words.forEach((w,i)=>{
+    const t=elapsed;
+    wordTimers.push(setTimeout(()=>{
+      if(i>0){const p=document.getElementById('wt'+(i-1));if(p)p.classList.remove('active-word');}
+      const el=document.getElementById('wt'+i);
+      if(el)el.classList.add('revealed','active-word');
+    },t));
+    elapsed+=usable*(weights[i]/totalWeight);
+  });
+
+  wordTimers.push(setTimeout(()=>{
+    const l=document.getElementById('wt'+(n-1));
+    if(l)l.classList.remove('active-word');
+  },elapsed+50));
+}
+
+function stopLocalSpeech() {
+  wordTimers.forEach(clearTimeout);
+  wordTimers=[];
+  if (typeof speechSynthesis !== 'undefined') {
+    speechSynthesis.cancel();
+  }
+  currentUtterance=null;
+}
+
+async function showSlide(idx){
+  if(loadingSlide)return;
+  const slide=slides[idx];
+  const currEl=document.getElementById('curr-line');
+  const prevEl=document.getElementById('prev-line');
+  
+  stopLocalSpeech();
+  
+  prevEl.textContent=prevText;
+  currEl.classList.remove('visible');currEl.innerHTML='';
+  document.getElementById('progress-bar').style.width=(((idx+1)/slides.length)*100)+'%';
+  document.getElementById('slide-counter').textContent=(idx+1)+' / '+slides.length;
+
+  setTimeout(()=>{
+    currEl.innerHTML=revealMode==='full'?renderFull(slide.text):renderWordByWord(slide.text);
+    currEl.classList.add('visible');
+  },150);
+
+  if(!playing)return;
+
+  const utterance = new SpeechSynthesisUtterance(slide.text);
+  utterance.rate = Math.min(Math.max(speed, 0.5), 2.0);
+  
+  if(systemVoices && systemVoices[selectedVoiceIndex]) {
+    utterance.voice = systemVoices[selectedVoiceIndex];
+  }
+  
+  currentUtterance = utterance;
+
+  // CRITICAL FIX: Trigger the word highlighting script ONLY when the voice engine genuinely fires up 
+  utterance.onstart = () => {
+    if(revealMode==='word' && playing){
+      scheduleWordRevealTimed(slide.text);
+    }
+  };
+
+  utterance.onend = () => {
+    if(!playing)return;
+    prevText=slide.text;
+    if(current<slides.length-1){
+      setTimeout(()=>{if(playing){current++;showSlide(current);}},500);
+    } else {
+      playing=false;
+      document.getElementById('play-btn').textContent='▶ Play';
+      document.getElementById('play-btn').classList.remove('active');
+    }
+  };
+
+  utterance.onerror = (e) => {
+    if(e.error !== 'interrupted') {
+      showErr('Speech engine error.');
+      advanceAfterMs(slide.text,2000);
+    }
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function advanceAfterMs(text,ms){setTimeout(()=>{if(!playing)return;prevText=text;if(current<slides.length-1){current++;showSlide(current);}},ms);}
+
+function togglePlay(){
+  playing=!playing;
+  const btn=document.getElementById('play-btn');
+  if(playing){
+    btn.textContent='⏸ Pause';
+    btn.classList.add('active');
+    showSlide(current);
+  }else{
+    btn.textContent='▶ Play';
+    btn.classList.remove('active');
+    stopLocalSpeech();
+  }
+}
+
+function restartPresentation() {
+  stopLocalSpeech();
+  current = 0;
+  prevText = '';
+  playing = true; 
+  document.getElementById('play-btn').textContent='⏸ Pause';
+  document.getElementById('play-btn').classList.add('active');
+  showSlide(current);
+}
+
+function nextSlide(){
+  stopLocalSpeech();
+  prevText=slides[current].text;
+  if(current<slides.length-1){current++;showSlide(current);}
+}
+
+function prevSlide(){
+  stopLocalSpeech();
+  if(current>0){current--;prevText=current>0?slides[current-1].text:'';showSlide(current);}
+}
+
+function resetToInput(){
+  stopLocalSpeech();
+  playing=false;prevText='';loadingSlide=false;
+  document.getElementById('player-panel').style.display='none';
+  document.getElementById('input-panel').style.display='block';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadVoices, 200);
+});
+</script>
+</body>
+</html>
