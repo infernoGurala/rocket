@@ -36,16 +36,53 @@
   #prev-line{font-family:'Libre Baskerville',serif;font-size:15px;font-style:italic;color:#2a2520;opacity:0.25;line-height:1.5;margin-bottom:1.2rem;min-height:22px;pointer-events:none;}
   #curr-line{font-size:24px;line-height:1.4;color:#2a2520;opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease;}
   #curr-line.visible{opacity:1;transform:translateY(0);}
-  .w-plain{font-family:'Libre Baskerville',serif;color:#2a2520;}
-  .w-key{font-family:'DM Serif Display',serif;font-style:italic;color:#c8622a;}
-  .w-strong{font-family:'Playfair Display',serif;font-weight:700;color:#2a2520;}
-  .w-term{font-family:'Playfair Display',serif;font-weight:700;color:#c87d0a;}
+  /* === SEMANTIC HIGHLIGHT TIERS === */
+
+  /* Base reading text — no special treatment */
+  .w-plain {
+    font-family: 'Libre Baskerville', serif;
+    color: #2a2520;
+  }
+
+  /* Tier 1: w-key — Core concept, structural anchor */
+  /* SIGNAL: weight only. Same color as plain text so it doesn't distract. */
+  .w-key {
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700;
+    color: #2a2520;
+  }
+
+  /* Tier 2: w-strong — Emotional emphasis, contrast, action verbs */
+  /* SIGNAL: italic + warm orange. Reads as "pause and feel this word." */
+  .w-strong {
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: #b85c1e;
+  }
+
+  /* Tier 3: w-term — Technical term, proper noun, domain jargon */
+  /* SIGNAL: amber/gold color, normal weight. No drama, just a flag. */
+  .w-term {
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 400;
+    color: #8a6a00;
+  }
+
   .word-token{display:inline;opacity:0;transition:opacity .12s ease;}
   .word-token.revealed{opacity:1;}
-  .word-token.active-word{text-decoration: underline; text-underline-offset: 4px; text-decoration-color: #c8622a; text-decoration-thickness: 1.5px;}
+
+  /* Active word (currently being spoken via TTS audio sync) */
+  /* SIGNAL: underline only, neutral color. Live signal, not semantic. */
+  .word-token.active-word {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: #2a2520;
+    text-decoration-thickness: 1.5px;
+  }
   #progress-bar-wrap{height:4px;background:#333;width:100%;}
   #progress-bar{height:100%;background:#c8622a;transition:width .3s ease;width:0%;}
-  
+
   /* Mobile Responsive Controls Layout */
   #controls{display:flex;flex-direction:column;gap:12px;padding:1.2rem 1rem;background:#222;border-radius:0 0 8px 8px;}
   .ctrl-row-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;}
@@ -60,6 +97,7 @@
   #back-btn{margin:.5rem 0.5rem 0.8rem;font-size:14px;font-family:sans-serif;color:#aaa;cursor:pointer;background:none;border:none;padding:5px 0;text-decoration:underline;text-underline-offset:4px;display:inline-block;}
   #back-btn:hover{color:#e8e0d4;}
   #err-bar{display:none;padding:8px 1rem;font-size:12px;font-family:sans-serif;color:#991b1b;background:#fef2f2;border:.5px solid #fca5a5;border-radius:4px;margin-bottom:8px;}
+
 
   @media(min-width: 600px) {
     #stage { min-height: 360px; padding: 2.5rem 3.5rem 3rem; }
@@ -83,15 +121,214 @@
   .preset-btn { padding: 8px 14px; background: #2a2a2a; color: #e8e0d4; border: .5px solid #444; border-radius: 8px; font-size: 13px; font-family: sans-serif; cursor: pointer; transition: background .12s; }
   .preset-btn:hover { background: #333; }
 
+  /* Audio Selection */
+  .audio-selection-container {
+    margin-bottom: 1.2rem;
+    background: #2a2a2a;
+    border: .5px solid #444;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .audio-select-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0.6rem;
+  }
+  .audio-select-wrap {
+    flex: 1;
+  }
+  .audio-select-wrap select {
+    width: 100%;
+    padding: 8px 28px 8px 10px;
+    border: .5px solid #444;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: sans-serif;
+    background: #1a1a1a;
+    color: #e8e0d4;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: border-color .12s;
+  }
+  .audio-select-wrap {
+    position: relative;
+    flex: 1;
+  }
+  .audio-select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #888;
+    pointer-events: none;
+  }
+  .audio-select-wrap select:hover,
+  .audio-select-wrap select:focus {
+    border-color: #666;
+  }
+  .voice-filters {
+    display: flex;
+    gap: 0;
+    margin-top: 0.7rem;
+    border: .5px solid #444;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .voice-filters .filter-btn {
+    padding: 6px 16px;
+    background: #2a2a2a;
+    color: #888;
+    border: none;
+    font-size: 12px;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .voice-filters .filter-btn:not(:last-child) {
+    border-right: .5px solid #444;
+  }
+  .voice-filters .filter-btn:hover {
+    background: #333;
+  }
+  .voice-filters .filter-btn.active {
+    background: #e8e0d4;
+    color: #1a1a1a;
+  }
+  .audio-preview-btn {
+    height: 36px;
+    border-radius: 8px;
+    border: .5px solid #444;
+    background: #2a2a2a;
+    color: #e8e0d4;
+    font-size: 13px;
+    font-family: sans-serif;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background .12s, border-color .12s;
+    padding: 0 14px;
+    white-space: nowrap;
+  }
+  .audio-preview-btn svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+  .audio-preview-btn:hover {
+    background: #333;
+    border-color: #666;
+  }
+  .audio-preview-btn:active {
+    background: #1e1e1e;
+  }
+  .audio-preview-btn.playing {
+    border-color: #c8622a;
+    color: #c8622a;
+    background: rgba(200, 98, 42, 0.08);
+  }
+
+  /* Fullscreen AI Processing Loader Overlay */
+  .gen-loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(26, 26, 26, 0.96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+  }
+  .gen-loader-overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Style Toggles */
+  .style-toggle {
+    display: flex;
+    gap: 0;
+    border: .5px solid #444;
+    border-radius: 8px;
+    overflow: hidden;
+    width: fit-content;
+  }
+  .style-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-family: sans-serif;
+    border: none;
+    background: #2a2a2a;
+    color: #888;
+    cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .style-btn.active {
+    background: #e8e0d4;
+    color: #1a1a1a;
+  }
+  .style-btn:not(:last-child) {
+    border-right: .5px solid #444;
+  }
+
+  /* Active Word Highlight Mode — layout-safe: inset box-shadow paints color
+     without changing size, padding, or margin so text never shifts position */
+  #stage.style-highlight-active .word-token.active-word {
+    text-decoration: none !important;
+    border-radius: 3px;
+    box-shadow: inset 0 -1.4em 0 0 rgba(200, 98, 42, 0.28);
+    transition: box-shadow 0.08s ease;
+  }
+  #stage.dark-stage.style-highlight-active .word-token.active-word {
+    box-shadow: inset 0 -1.4em 0 0 rgba(232, 119, 74, 0.32);
+  }
+
   /* Stage Dark Mode with elegant high-contrast orange accent colors */
   #stage.dark-stage { background: #242424; border: .5px solid #444; }
   #stage.dark-stage #prev-line { color: #e8e0d4; opacity: 0.25; }
   #stage.dark-stage #curr-line { color: #e8e0d4; }
-  #stage.dark-stage .w-plain { color: #e8e0d4; }
-  #stage.dark-stage .w-key { color: #ff7a33; }
-  #stage.dark-stage .w-strong { color: #ffffff; }
-  #stage.dark-stage .w-term { color: #ff7a33; }
-  #stage.dark-stage .word-token.active-word { text-decoration-color: #ff7a33; }
+  /* === DARK STAGE OVERRIDES === */
+
+  #stage.dark-stage .w-plain  { color: #e8e0d4; }
+
+  #stage.dark-stage .w-key    {
+    color: #f5f0e8;
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  #stage.dark-stage .w-strong {
+    color: #e8774a;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  #stage.dark-stage .w-term   {
+    color: #d4a84b;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  #stage.dark-stage .word-token.active-word {
+    text-decoration-color: #e8e0d4;
+  }
 
   /* Centering in Fullscreen Mode */
   :-webkit-full-screen body { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; background: #1a1a1a; }
@@ -124,28 +361,79 @@
 </style>
 </head>
 <body>
+<!-- Fullscreen AI Processing Loader Overlay -->
+<div id="gen-loader" class="gen-loader-overlay">
+  <div style="text-align: center; max-width: 400px; padding: 20px;">
+    <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; color: #e8e0d4; margin-bottom: 12px; font-weight: normal; letter-spacing: 0.5px;">Launching Rocket...</h3>
+    <p style="font-family: sans-serif; font-size: 13px; color: #888; margin-bottom: 24px; line-height: 1.5;">Please wait while the server cooks ~30 seconds</p>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+      <span class="loading-dot" style="width: 8px; height: 8px;"></span>
+      <span class="loading-dot" style="width: 8px; height: 8px; animation-delay: .18s;"></span>
+      <span class="loading-dot" style="width: 8px; height: 8px; animation-delay: .36s;"></span>
+    </div>
+  </div>
+</div>
+
 <div id="app">
   <div id="input-panel">
     <h2>Paste your text to learn</h2>
-    <p>Using Local Browser Audio Engine (Universal TTS with Exact Synchronization)</p>
-    
+    <p>A Utopia project</p>
+
     <!-- Quick Presets -->
     <div class="presets-wrap">
       <div class="presets-title">✦ Click to Load a Demo Text:</div>
       <div class="presets-row">
-        <button class="preset-btn" onclick="loadPreset('gettysburg')">Gettysburg Address</button>
+        <button class="preset-btn" onclick="loadPreset('marcus')">Marcus Aurelius</button>
         <button class="preset-btn" onclick="loadPreset('quantum')">Quantum Superposition</button>
         <button class="preset-btn" onclick="loadPreset('computability')">Turing's Machine</button>
+        <button class="preset-btn" id="clear-btn" onclick="clearText()" style="display:none">✕ Clear</button>
       </div>
     </div>
 
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="mode-full" onclick="setMode('full')">Full Sentence</button>
-      <button class="mode-btn" id="mode-word" onclick="setMode('word')">Word by Word</button>
-    </div>
-    
     <textarea id="raw-text" placeholder="Paste notes, lectures, or any text..."></textarea>
-    
+
+    <!-- Simple Audio Selection -->
+    <div class="audio-selection-container">
+      <div class="presets-title">✦ Select Voice (click ▶ to preview):</div>
+      <div class="voice-filters">
+        <button class="filter-btn active" data-filter="all" onclick="filterAudioVoices('all')">All</button>
+        <button class="filter-btn" data-filter="female" onclick="filterAudioVoices('female')">Female</button>
+        <button class="filter-btn" data-filter="male" onclick="filterAudioVoices('male')">Male</button>
+      </div>
+      <div class="audio-select-row">
+        <div class="audio-select-wrap">
+          <select id="audio-voice-sel" onchange="selectVoiceFromDropdown(this)">
+            <option value="">Loading voices...</option>
+          </select>
+        </div>
+        <button class="audio-preview-btn" id="audio-preview-btn" onclick="previewSelectedVoice()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11.04-6.86a1 1 0 0 0 0-1.72L9.5 4.28A1 1 0 0 0 8 5.14z"/></svg>
+          <span id="preview-label">Preview</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Reader Mode & Visual Highlights Controls -->
+    <div style="margin-top: 1.2rem; margin-bottom: 1.2rem; display: flex; flex-wrap: wrap; gap: 20px;">
+      <!-- Follow Mode Selector -->
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 200px;">
+        <div class="presets-title">✦ Follow Mode:</div>
+        <div class="mode-toggle" style="margin-bottom: 0;">
+          <button class="mode-btn active" id="mode-full" onclick="setMode('full')">Full Sentence</button>
+          <button class="mode-btn" id="mode-word" onclick="setMode('word')">Word by Word</button>
+        </div>
+      </div>
+
+      <!-- Active Highlight Style Selector -->
+      <div style="display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 200px;">
+        <div class="presets-title">✦ Active Highlight Style:</div>
+        <div class="style-toggle">
+          <button class="style-btn active" id="style-highlight" onclick="setHighlightStyle('highlight')">Text Highlight</button>
+          <button class="style-btn" id="style-underline" onclick="setHighlightStyle('underline')">Line Follow (Voice)</button>
+        </div>
+      </div>
+    </div>
+
     <div class="btn-row">
       <button class="btn-secondary" onclick="fixSentences()">✦ Fix Sentences</button>
       <button class="btn-primary" onclick="buildSlides()">Generate →</button>
@@ -157,6 +445,7 @@
     <div id="player-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
       <button id="back-btn" onclick="resetToInput()">← Edit text</button>
       <div style="display: flex; gap: 12px; align-items: center;">
+
         <button id="stage-theme-btn" onclick="toggleStageTheme()" style="background: none; border: none; font-size: 13px; font-family: sans-serif; color: #888; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; padding: 5px 0; display: inline-block;">🌙 Dark Stage</button>
         <button id="history-toggle-btn" onclick="toggleHistory()" style="background: none; border: none; font-size: 13px; font-family: sans-serif; color: #888; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; padding: 5px 0; display: inline-block;">👁 Hide History</button>
         <button id="focus-btn" onclick="toggleFocusMode()" style="background: none; border: none; font-size: 13px; font-family: sans-serif; color: #888; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; padding: 5px 0; display: inline-block;">👁 Focus Mode</button>
@@ -180,14 +469,14 @@
 
     <div id="err-bar"></div>
     <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
-    
+
     <div id="stage">
       <button id="exit-focus-btn" onclick="toggleFocusMode()" style="display: none; position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 18px; color: #888; cursor: pointer; font-family: sans-serif; z-index: 10;">✕</button>
       <div id="loading-overlay"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>
       <div id="prev-line"></div>
       <div id="curr-line"></div>
     </div>
-    
+
     <div id="controls">
       <div class="ctrl-row-top">
         <div class="ctrl-buttons-group">
@@ -198,7 +487,7 @@
         </div>
         <span id="slide-counter">1 / 1</span>
       </div>
-      
+
       <div class="ctrl-row-bottom">
         <div class="ctrl-group">Speed:
           <select class="ctrl-select" id="speed-sel" onchange="updateSpeed(this.value)">
@@ -215,15 +504,10 @@
         <div class="ctrl-group">Voice:
           <select class="ctrl-select" id="voice-sel" onchange="updateVoice()"></select>
         </div>
-        <div class="ctrl-group">Sync Adjust:
-          <select class="ctrl-select" id="sync-sel" onchange="updateSyncBias(this.value)">
-            <option value="120">Very Slow Underlines</option>
-            <option value="140">Slower Underlines</option>
-            <option value="160" selected>Standard Underlines</option>
-            <option value="180">Brisk Underlines</option>
-            <option value="200">Faster Underlines</option>
-            <option value="220">Very Fast Underlines</option>
-            <option value="240">Ultra Fast Underlines</option>
+        <div class="ctrl-group">Follow Style:
+          <select class="ctrl-select" id="style-sel" onchange="setHighlightStyle(this.value)">
+            <option value="highlight" selected>Highlight</option>
+            <option value="underline">Underline</option>
           </select>
         </div>
       </div>
@@ -235,7 +519,10 @@
 // State Management
 let slides = [], current = 0, playing = true, speed = 1;
 let revealMode = 'full';
+let highlightStyle = 'highlight';
 let prevText = '', loadingSlide = false;
+let allVoices = [];
+let voiceGenderFilter = 'all';
 let currentUtterance = null;
 let systemVoices = [];
 let selectedVoiceIndex = 0;
@@ -251,13 +538,18 @@ let boundaryStart = 0;
 let syncWpm = parseInt(localStorage.getItem('rocket-syncWpm')) || 160;
 let focusMode = false;
 let activeAudio = null;
+let accumulatedMs = 0;
+let slideAudioCache = {};
+let cacheQueue = new Set();
 
 // Presets data
 const presets = {
-  gettysburg: "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.",
+  marcus: "When you wake up in the morning, tell yourself: The people I deal with today will be meddling, ungrateful, arrogant, dishonest, jealous, and surly. They are like this because they cannot distinguish good from evil. But I have seen the beauty of good, and the ugliness of evil, and have recognized that the wrongdoer has a nature related to my own—not of the same blood or birth, but the same mind, and possessing a share of the divine. And so none of them can hurt me.",
   quantum: "Quantum mechanics is a fundamental theory in physics that describes the physical properties of nature at the scale of atoms and subatomic particles. It is the foundation of all quantum physics including quantum chemistry, quantum field theory, quantum technology, and quantum information science. A quantum computer operates using principles of superposition and entanglement, allowing it to perform complex calculations exponentially faster than classical supercomputers. This opens new frontiers in cryptography, molecular simulation, and artificial intelligence.",
   computability: "I propose to consider the question, 'Can machines think?' This should begin with definitions of the meaning of the terms 'machine' and 'think'. The new form of the problem can be described in terms of a game which we call the 'imitation game'. It is played with three people, a man, a woman, and an interrogator who may be of either sex. The interrogator stays in a room apart from the other two. The object of the game for the interrogator is to determine which of the other two is the man and which is the woman."
 };
+
+const BASE = 'https://infernoGurala-rocket-tts.hf.space';
 
 function setMode(m){
   revealMode=m;
@@ -265,75 +557,294 @@ function setMode(m){
   document.getElementById('mode-word').classList.toggle('active',m==='word');
 }
 
-function loadVoices() {
-  if (typeof speechSynthesis === 'undefined') return;
-  systemVoices = speechSynthesis.getVoices();
-  const voiceSelect = document.getElementById('voice-sel');
-  if(!voiceSelect) return;
+function setHighlightStyle(style) {
+  highlightStyle = style;
+  localStorage.setItem('rocket-highlightStyle', style);
   
-  voiceSelect.innerHTML = '';
+  const styleUnderline = document.getElementById('style-underline');
+  const styleHighlight = document.getElementById('style-highlight');
   
-  // Add premium neural option at the top of select
-  const premiumOpt = document.createElement('option');
-  premiumOpt.value = "google-premium";
-  premiumOpt.textContent = "✨ Google Neural Cloud Voice";
-  voiceSelect.appendChild(premiumOpt);
-
-  if(systemVoices.length === 0) {
-    return;
+  if (styleUnderline) styleUnderline.classList.toggle('active', style === 'underline');
+  if (styleHighlight) styleHighlight.classList.toggle('active', style === 'highlight');
+  
+  const styleSel = document.getElementById('style-sel');
+  if (styleSel) {
+    styleSel.value = style;
   }
-
-  // Pre-load selected index if stored
-  const storedVoiceIndex = localStorage.getItem('rocket-voiceIndex');
-  if (storedVoiceIndex !== null) {
-    if (storedVoiceIndex === "google-premium") {
-      selectedVoiceIndex = "google-premium";
-    } else {
-      selectedVoiceIndex = parseInt(storedVoiceIndex);
-    }
-  }
-
-  systemVoices.forEach((voice, i) => {
-    const option = document.createElement('option');
-    option.value = i;
-    let displayName = `${voice.name} (${voice.lang})`;
-    if(voice.localService) displayName += ' [Local]';
-    option.textContent = displayName;
-    
-    // Choose en-US if no previous voice selected
-    if(storedVoiceIndex === null && (voice.default || voice.lang.includes('en-US') || voice.lang.includes('en_US'))) {
-      selectedVoiceIndex = i;
-    }
-    voiceSelect.appendChild(option);
-  });
   
-  if (selectedVoiceIndex === "google-premium") {
-    voiceSelect.value = "google-premium";
-  } else if (selectedVoiceIndex < systemVoices.length) {
-    voiceSelect.value = selectedVoiceIndex;
+  const stage = document.getElementById('stage');
+  if (stage) {
+    stage.classList.toggle('style-highlight-active', style === 'highlight');
   }
 }
 
-if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = loadVoices;
+let currentPreviewAudio = null;
+let currentPreviewButton = null;
+
+function previewVoice(voiceId, buttonElement, event) {
+  if (event) {
+    event.stopPropagation(); // Prevent card selection click
+  }
+
+  if (currentPreviewAudio) {
+    currentPreviewAudio.pause();
+    const prevBtn = currentPreviewButton;
+    if (prevBtn) {
+      prevBtn.innerHTML = "▶";
+      prevBtn.classList.remove("playing");
+    }
+    // If clicking same button, toggle to pause
+    if (prevBtn === buttonElement) {
+      currentPreviewAudio = null;
+      currentPreviewButton = null;
+      return;
+    }
+  }
+
+  buttonElement.innerHTML = "⏳";
+  buttonElement.classList.add("playing");
+  currentPreviewButton = buttonElement;
+
+  const url = `${BASE}/api/sample?voice=${voiceId}`;
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        showErr(data.error);
+        buttonElement.innerHTML = "▶";
+        buttonElement.classList.remove("playing");
+        return;
+      }
+
+      currentPreviewAudio = new Audio("data:audio/wav;base64," + data.audio);
+      currentPreviewAudio.play()
+        .then(() => {
+          buttonElement.innerHTML = "⏸";
+        })
+        .catch(err => {
+          console.warn(err);
+          buttonElement.innerHTML = "▶";
+          buttonElement.classList.remove("playing");
+        });
+
+      currentPreviewAudio.onended = () => {
+        buttonElement.innerHTML = "▶";
+        buttonElement.classList.remove("playing");
+        currentPreviewAudio = null;
+        currentPreviewButton = null;
+      };
+    })
+    .catch(err => {
+      console.error(err);
+      buttonElement.innerHTML = "▶";
+      buttonElement.classList.remove("playing");
+      showErr("Could not play sample audio.");
+    });
+}
+
+function setPreviewIcon(btn, type) {
+  if (!btn) return;
+  const label = btn.querySelector('#preview-label');
+  const ico = btn.querySelector('svg');
+  if (type === 'play') {
+    if (ico) ico.outerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11.04-6.86a1 1 0 0 0 0-1.72L9.5 4.28A1 1 0 0 0 8 5.14z"/></svg>';
+    if (label) label.textContent = 'Preview';
+    btn.classList.remove('playing');
+  } else if (type === 'stop') {
+    if (ico) ico.outerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>';
+    if (label) label.textContent = 'Stop';
+    btn.classList.add('playing');
+  } else if (type === 'loading') {
+    if (ico) ico.outerHTML = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="50,80" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></circle></svg>';
+    if (label) label.textContent = '...';
+    btn.classList.add('playing');
+  }
+}
+
+function filterAudioVoices(gender) {
+  voiceGenderFilter = gender;
+  document.querySelectorAll('.voice-filters .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === gender);
+  });
+  const sel = document.getElementById('audio-voice-sel');
+  if (!sel) return;
+  Array.from(sel.options).forEach(opt => {
+    if (!opt.value || opt.value === 'offline') return;
+    const g = opt.dataset.gender;
+    opt.style.display = gender === 'all' || g === gender ? '' : 'none';
+  });
+  if (sel.selectedOptions[0] && sel.selectedOptions[0].style.display === 'none') {
+    const firstVisible = Array.from(sel.options).find(o => o.style.display !== 'none' && o.value);
+    if (firstVisible) sel.value = firstVisible.value;
+  }
+}
+
+function selectVoiceFromDropdown(sel) {
+  const val = sel.value;
+  if (val.startsWith("local-kokoro:")) {
+    selectedVoiceIndex = val;
+    localStorage.setItem('rocket-voiceIndex', selectedVoiceIndex);
+    const voiceSelect = document.getElementById('voice-sel');
+    if (voiceSelect) voiceSelect.value = val;
+    slideAudioCache = {};
+    stopLocalSpeech();
+    const player = document.getElementById('player-panel');
+    if (player && player.style.display === 'block') {
+      preCacheSlide(current);
+      preCacheSlide(current + 1);
+      if (playing) showSlide(current);
+    }
+    previewSelectedVoice();
+  }
+}
+
+function previewSelectedVoice() {
+  const sel = document.getElementById('audio-voice-sel');
+  if (!sel) return;
+  const val = sel.value;
+  if (!val || !val.startsWith("local-kokoro:")) {
+    showErr("No voice selected or server offline.");
+    return;
+  }
+  const voiceId = val.split(":")[1];
+  const btn = document.getElementById('audio-preview-btn');
+  if (!btn) return;
+
+  if (currentPreviewAudio) {
+    currentPreviewAudio.pause();
+    const prevBtn = currentPreviewButton;
+    if (prevBtn) setPreviewIcon(prevBtn, 'play');
+    if (prevBtn === btn) {
+      currentPreviewAudio = null;
+      currentPreviewButton = null;
+      return;
+    }
+  }
+
+  setPreviewIcon(btn, 'loading');
+  currentPreviewButton = btn;
+
+  fetch(`${BASE}/api/sample?voice=${voiceId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        showErr(data.error);
+        setPreviewIcon(btn, 'play');
+        return;
+      }
+      currentPreviewAudio = new Audio("data:audio/wav;base64," + data.audio);
+      currentPreviewAudio.play()
+        .then(() => { setPreviewIcon(btn, 'stop'); })
+        .catch(err => {
+          console.warn(err);
+          setPreviewIcon(btn, 'play');
+        });
+      currentPreviewAudio.onended = () => {
+        setPreviewIcon(btn, 'play');
+        currentPreviewAudio = null;
+        currentPreviewButton = null;
+      };
+    })
+    .catch(err => {
+      console.error(err);
+      setPreviewIcon(btn, 'play');
+      showErr("Could not play sample audio.");
+    });
+}
+
+function selectVoice(voiceId) {
+  selectedVoiceIndex = "local-kokoro:" + voiceId;
+  localStorage.setItem('rocket-voiceIndex', selectedVoiceIndex);
+
+  // Sync both dropdowns
+  const voiceSelect = document.getElementById('voice-sel');
+  if (voiceSelect) voiceSelect.value = selectedVoiceIndex;
+  const audioVoiceSel = document.getElementById('audio-voice-sel');
+  if (audioVoiceSel) audioVoiceSel.value = selectedVoiceIndex;
+
+  // Reset reader audio cache when changing voice
+  slideAudioCache = {};
+}
+
+function loadVoices() {
+  const voiceSelect = document.getElementById('voice-sel');
+  const audioVoiceSel = document.getElementById('audio-voice-sel');
+
+  if (voiceSelect) voiceSelect.innerHTML = '';
+  if (audioVoiceSel) audioVoiceSel.innerHTML = '';
+
+  // Load local Kokoro neural voices from backend server if available
+  fetch(`${BASE}/api/voices`)
+    .then(res => res.json())
+    .then(voices => {
+      allVoices = voices;
+      const dropdowns = [voiceSelect, audioVoiceSel].filter(Boolean);
+      dropdowns.forEach(sel => {
+        voices.forEach(v => {
+          const option = document.createElement('option');
+          option.value = "local-kokoro:" + v.id;
+          option.dataset.gender = v.id.startsWith('af_') || v.id.startsWith('bf_') ? 'female' : 'male';
+          const clean = v.name.replace(/\[.*?\]/g, '').replace(/^[ab][fem]_/i, '').trim();
+          const label = clean.charAt(0).toUpperCase() + clean.slice(1);
+          const displayName = label === 'Heart' ? 'Luna' : label;
+          const tag = v.name.match(/\[(.*?)\]/);
+          option.textContent = tag ? `${displayName} (${tag[1]})` : displayName;
+          sel.appendChild(option);
+        });
+      });
+
+      let savedVoiceIndex = localStorage.getItem('rocket-voiceIndex');
+      if (!savedVoiceIndex || !savedVoiceIndex.startsWith("local-kokoro:")) {
+        if (voices.length > 0) {
+          savedVoiceIndex = "local-kokoro:" + voices[0].id;
+          localStorage.setItem('rocket-voiceIndex', savedVoiceIndex);
+        }
+      }
+
+      selectedVoiceIndex = savedVoiceIndex;
+      dropdowns.forEach(sel => { sel.value = selectedVoiceIndex; });
+    })
+    .catch(err => {
+      console.log("Local backend server is offline.");
+      const offlineMsg = "🔴 Kokoro TTS Server Offline";
+      [voiceSelect, audioVoiceSel].filter(Boolean).forEach(sel => {
+        sel.innerHTML = `<option value="offline">${offlineMsg}</option>`;
+      });
+    });
 }
 
 function updateVoice(){
   const val = document.getElementById('voice-sel').value;
-  if (val === "google-premium") {
-    selectedVoiceIndex = "google-premium";
-  } else {
-    selectedVoiceIndex = parseInt(val) || 0;
-  }
-  localStorage.setItem('rocket-voiceIndex', selectedVoiceIndex);
-  if(playing) {
-    showSlide(current);
+  if (val.startsWith("local-kokoro:")) {
+    selectedVoiceIndex = val;
+    localStorage.setItem('rocket-voiceIndex', selectedVoiceIndex);
+
+    // Sync input panel dropdown
+    const audioVoiceSel = document.getElementById('audio-voice-sel');
+    if (audioVoiceSel) audioVoiceSel.value = val;
+
+    // Reset cache and pre-cache for the updated voice style
+    slideAudioCache = {};
+    preCacheSlide(current);
+    preCacheSlide(current + 1);
+    preCacheSlide(current + 2);
+
+    if(playing) {
+      showSlide(current);
+    }
   }
 }
 
 function updateSpeed(v){
   speed=parseFloat(v);
   localStorage.setItem('rocket-speed', speed);
+
+  // Reset cache and pre-cache for the updated speed configuration
+  slideAudioCache = {};
+  preCacheSlide(current);
+  preCacheSlide(current + 1);
+  preCacheSlide(current + 2);
+
   if(playing) {
     showSlide(current);
   }
@@ -371,11 +882,11 @@ function getCleanWords(text) {
 }
 
 // Tokenize text into words with exact character offset ranges
-function prepareWordTokens(text) {
+function prepareWordTokens(text, groqStyles = null) {
   const words = getCleanWords(text);
   const tokens = [];
   let searchIndex = 0;
-  
+
   words.forEach((w, i) => {
     let idx = text.indexOf(w, searchIndex);
     if (idx === -1) {
@@ -384,21 +895,34 @@ function prepareWordTokens(text) {
     if (idx === -1) {
       idx = searchIndex;
     }
-    
+
+    // Choose dynamic style from Groq semantic analysis or fallback to local heuristics
+    let className = 'w-plain';
+    if (groqStyles) {
+      const normalized = w.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (groqStyles[normalized]) {
+        className = groqStyles[normalized];
+      } else {
+        className = classifyWord(w, words, i);
+      }
+    } else {
+      className = classifyWord(w, words, i);
+    }
+
     tokens.push({
       word: w,
       startIndex: idx,
       endIndex: idx + w.length,
-      className: classifyWord(w, words, i)
+      className: className
     });
-    
+
     searchIndex = idx + w.length;
   });
-  
+
   return tokens;
 }
 
-// Token-based stage render functions using the exact old grammatical classes
+// Token-based stage render functions using the exact grammatical classes
 function renderFull(tokens){
   return tokens.map((token,i)=>`<span class="word-token revealed ${token.className}" id="wt${i}" onclick="handleWordClick(${i})">${token.word}</span>`).join(' ');
 }
@@ -415,50 +939,105 @@ function buildSlides(){
   const raw=document.getElementById('raw-text').value.trim();if(!raw)return;
   localStorage.setItem('rocket-rawText', raw);
   slides=parseText(raw);if(!slides.length)return;
-  loadVoices();
+  
+  // Show fullscreen processing loader screen
+  const genLoader = document.getElementById('gen-loader');
+  if (genLoader) {
+    genLoader.classList.add('show');
+  }
+
   current=0;playing=false;prevText='';
-  document.getElementById('input-panel').style.display='none';
-  document.getElementById('player-panel').style.display='block';
-  document.getElementById('play-btn').innerHTML = '▶ Play';
-  document.getElementById('play-btn').classList.remove('active');
-  applyStageTheme();
-  applyHistoryPreference();
-  showSlide(current);
+  slideAudioCache = {};
+
+  // Pre-cache all slides in one batch request
+  async function cacheAllSlides() {
+    if (typeof selectedVoiceIndex !== 'string' || !selectedVoiceIndex.startsWith("local-kokoro:")) return;
+    const voiceId = selectedVoiceIndex.split(":")[1];
+    const texts = slides.map(s => s.text);
+
+    const res = await fetch(`${BASE}/api/tts/batch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts, voice: voiceId, speed })
+    });
+    const data = await res.json();
+
+    data.results.forEach((item, idx) => {
+      if (item.error || !item.audio) return;
+      const audio = new Audio("data:audio/wav;base64," + item.audio);
+      const tokens = prepareWordTokens(slides[idx].text, item.groq_styles || null);
+      const timings = item.timings.map((t, ti) => {
+        const orig = tokens[ti];
+        return {
+          ...t,
+          startTime: t.start,
+          endTime: t.end,
+          startIndex: orig ? orig.startIndex : 0,
+          endIndex: orig ? orig.endIndex : 0,
+          className: orig ? orig.className : 'w-plain'
+        };
+      });
+      slideAudioCache[idx] = { audio, timings, groqStyles: item.groq_styles || null };
+    });
+  }
+
+  cacheAllSlides()
+    .then(() => {
+      if (genLoader) genLoader.classList.remove('show');
+      document.getElementById('input-panel').style.display='none';
+      document.getElementById('player-panel').style.display='block';
+      document.getElementById('play-btn').innerHTML = '▶ Play';
+      document.getElementById('play-btn').classList.remove('active');
+      applyStageTheme();
+      applyHistoryPreference();
+      showSlide(current);
+    })
+    .catch(err => {
+      console.warn("Pre-cache failed:", err);
+      if (genLoader) genLoader.classList.remove('show');
+      document.getElementById('input-panel').style.display='none';
+      document.getElementById('player-panel').style.display='block';
+      document.getElementById('play-btn').innerHTML = '▶ Play';
+      document.getElementById('play-btn').classList.remove('active');
+      applyStageTheme();
+      applyHistoryPreference();
+      showSlide(current);
+    });
 }
 
 // Punctuation-Aware Pacing Model: distributes exact millisecond timelines
 function calculateWordTimings(tokens, totalMs) {
   const n = tokens.length;
   if (n === 0) return [];
-  
+
   let sumP = 0;
   let sumW = 0;
-  
+
   const wordDetails = tokens.map((token, i) => {
     const cleanWord = token.word.replace(/[^a-zA-Z0-9]/g, '');
     const rawLength = Math.max(1, cleanWord.length);
-    
+
     let pPause = 0;
     if (/[.!?]/.test(token.word) || token.word.endsWith('...')) {
       pPause = 550; // Period / Question / Exclamation pause
     } else if (/[,,;:\-—"']/.test(token.word)) {
       pPause = 250; // Comma / Semicolon / Colon / Dash pause
     }
-    
+
     if (i === n - 1 && pPause === 0) {
       pPause = 400; // Trailing pause for sentence transitions
     }
-    
+
     sumP += pPause;
     sumW += rawLength;
-    
+
     return {
       token,
       rawLength,
       punctuationPause: pPause
     };
   });
-  
+
   let speakingMs = totalMs - sumP;
   if (speakingMs < 100 * n) {
     speakingMs = totalMs * 0.7;
@@ -467,14 +1046,14 @@ function calculateWordTimings(tokens, totalMs) {
       d.punctuationPause *= pauseScale;
     });
   }
-  
+
   let currentOffset = 0;
   return wordDetails.map((d) => {
     const wordDur = (d.rawLength / sumW) * speakingMs;
     const startTime = currentOffset;
     const endTime = startTime + wordDur + d.punctuationPause;
     currentOffset = endTime;
-    
+
     return {
       ...d.token,
       startTime,
@@ -488,25 +1067,26 @@ function calculateWordTimings(tokens, totalMs) {
 // High-Performance Frame-Locked Sync Loop using requestAnimationFrame
 function startSyncLoop() {
   cancelSyncLoop();
-  
+
   function update() {
     if (!playing) return;
-    
+
     let elapsedMs = 0;
-    if (selectedVoiceIndex === "google-premium") {
+    const isKokoro = typeof selectedVoiceIndex === 'string' && selectedVoiceIndex.startsWith("local-kokoro:");
+    if (selectedVoiceIndex === "google-premium" || isKokoro) {
       if (activeAudio) {
-        elapsedMs = activeAudio.currentTime * 1000;
+        elapsedMs = (isKokoro ? 0 : accumulatedMs) + activeAudio.currentTime * 1000;
       } else {
         elapsedMs = Date.now() - syncStartTime;
       }
     } else {
       elapsedMs = Date.now() - syncStartTime;
     }
-    
+
     highlightWordAtTime(elapsedMs);
     syncLoopId = requestAnimationFrame(update);
   }
-  
+
   syncLoopId = requestAnimationFrame(update);
 }
 
@@ -519,7 +1099,7 @@ function cancelSyncLoop() {
 
 function highlightWordAtTime(elapsedMs) {
   if (!activeTimedTokens || activeTimedTokens.length === 0) return;
-  
+
   let activeIdx = -1;
   for (let i = 0; i < activeTimedTokens.length; i++) {
     const token = activeTimedTokens[i];
@@ -528,11 +1108,11 @@ function highlightWordAtTime(elapsedMs) {
       break;
     }
   }
-  
+
   if (activeIdx === -1 && elapsedMs >= activeTimedTokens[activeTimedTokens.length - 1].endTime) {
     activeIdx = activeTimedTokens.length - 1;
   }
-  
+
   activeTimedTokens.forEach((_, i) => {
     const el = document.getElementById('wt' + i);
     if (el) {
@@ -562,6 +1142,86 @@ function stopLocalSpeech() {
     activeAudio.pause();
     activeAudio = null;
   }
+  if (currentPreviewAudio) {
+    currentPreviewAudio.pause();
+    if (currentPreviewButton) {
+      currentPreviewButton.innerHTML = "▶";
+      currentPreviewButton.classList.remove("playing");
+    }
+    currentPreviewAudio = null;
+    currentPreviewButton = null;
+  }
+}
+
+// Split text into chunks that satisfy Google Translate TTS 200-char limit
+function chunkTextForTTS(text, maxLength = 180) {
+  const words = text.split(/\s+/);
+  const chunks = [];
+  let currentChunk = '';
+
+  words.forEach(word => {
+    if ((currentChunk + ' ' + word).trim().length <= maxLength) {
+      currentChunk = (currentChunk + ' ' + word).trim();
+    } else {
+      if (currentChunk) chunks.push(currentChunk);
+      currentChunk = word;
+    }
+  });
+  if (currentChunk) chunks.push(currentChunk);
+
+  return chunks;
+}
+
+function preCacheSlide(idx) {
+  if (idx < 0 || idx >= slides.length) return Promise.resolve(null);
+  if (slideAudioCache[idx]) return Promise.resolve(slideAudioCache[idx]);
+  if (cacheQueue.has(idx)) return Promise.resolve(null);
+  if (typeof selectedVoiceIndex !== 'string' || !selectedVoiceIndex.startsWith("local-kokoro:")) return Promise.resolve(null);
+
+  cacheQueue.add(idx);
+  const slide = slides[idx];
+  const voiceId = selectedVoiceIndex.split(":")[1];
+  const url = `${BASE}/api/tts?text=${encodeURIComponent(slide.text)}&voice=${voiceId}&speed=${speed}`;
+  return fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      cacheQueue.delete(idx);
+      if (data.error) throw new Error(data.error);
+
+      const audio = new Audio("data:audio/wav;base64," + data.audio);
+      const groqStyles = data.groq_styles || null;
+      const tokens = prepareWordTokens(slide.text, groqStyles);
+      const timings = data.timings.map((t, idx_token) => {
+        const originalToken = tokens[idx_token];
+        return {
+          ...t,
+          startTime: t.start,
+          endTime: t.end,
+          startIndex: originalToken ? originalToken.startIndex : 0,
+          endIndex: originalToken ? originalToken.endIndex : 0,
+          className: originalToken ? originalToken.className : 'w-plain'
+        };
+      });
+
+      slideAudioCache[idx] = { audio, timings, groqStyles };
+      console.log(`Pre-cached slide ${idx + 1}`);
+
+      // If this pre-cached slide is the current active slide, hot-reload the highlights!
+      if (idx === current) {
+        activeTokens = tokens;
+        activeTimedTokens = timings;
+        const currEl = document.getElementById('curr-line');
+        if (currEl && currEl.classList.contains('visible')) {
+          currEl.innerHTML = revealMode === 'full' ? renderFull(activeTokens) : renderWordByWord(activeTokens);
+        }
+      }
+      return slideAudioCache[idx];
+    })
+    .catch(err => {
+      cacheQueue.delete(idx);
+      console.log(`Error pre-caching slide ${idx + 1}`);
+      throw err;
+    });
 }
 
 async function showSlide(idx){
@@ -569,15 +1229,18 @@ async function showSlide(idx){
   const slide=slides[idx];
   const currEl=document.getElementById('curr-line');
   const prevEl=document.getElementById('prev-line');
-  
+
   stopLocalSpeech();
-  
+
   prevEl.textContent=prevText;
   currEl.classList.remove('visible');currEl.innerHTML='';
   document.getElementById('progress-bar').style.width=(((idx+1)/slides.length)*100)+'%';
   document.getElementById('slide-counter').textContent=(idx+1)+' / '+slides.length;
 
-  activeTokens = prepareWordTokens(slide.text);
+  // Retrieve cached slide if present to get Groq styles
+  const cached = slideAudioCache[idx];
+  const groqStyles = cached ? cached.groqStyles : null;
+  activeTokens = prepareWordTokens(slide.text, groqStyles);
 
   setTimeout(()=>{
     currEl.innerHTML=revealMode==='full'?renderFull(activeTokens):renderWordByWord(activeTokens);
@@ -586,95 +1249,241 @@ async function showSlide(idx){
 
   if(!playing)return;
 
-  // Premium Google Cloud Voice play logic
-  if (selectedVoiceIndex === "google-premium") {
-    const text = slide.text;
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(text)}`;
-    const audio = new Audio(url);
-    audio.playbackRate = speed;
-    activeAudio = audio;
-    
-    let initialized = false;
-    const initAudioPacing = () => {
-      if (initialized) return;
-      initialized = true;
-      
-      let duration = audio.duration;
-      if (!duration || isNaN(duration) || duration === Infinity) {
-        const baseWpm = syncWpm * speed;
-        duration = (activeTokens.length / baseWpm) * 60;
-      }
-      
-      const totalMs = duration * 1000;
-      activeTimedTokens = calculateWordTimings(activeTokens, totalMs);
-      
+  // Local Kokoro Neural TTS play logic
+  if (typeof selectedVoiceIndex === 'string' && selectedVoiceIndex.startsWith("local-kokoro:")) {
+    // Chain background pre-caching for next slides
+    preCacheSlide(idx + 1);
+    preCacheSlide(idx + 2);
+
+    // Check if the slide is already cached!
+    if (cached) {
+      console.log(`Playing pre-cached slide ${idx + 1}`);
+      activeAudio = cached.audio;
+      activeAudio.currentTime = 0; // Reset playback to start
+      activeTimedTokens = cached.timings;
+
       if (playing) {
         syncStartTime = Date.now();
         startSyncLoop();
+        activeAudio.play().catch(err => {
+          console.warn("Audio playback blocked:", err);
+          playing = false;
+          document.getElementById('play-btn').innerHTML = '▶ Play';
+          document.getElementById('play-btn').classList.remove('active');
+        });
       }
-    };
-    
-    audio.onloadedmetadata = initAudioPacing;
-    audio.oncanplay = initAudioPacing;
-    audio.onplay = initAudioPacing;
-    
-    audio.play().then(() => {
-      initAudioPacing();
-    }).catch(err => {
-      console.warn("Audio playback blocked:", err);
-      playing = false;
-      document.getElementById('play-btn').innerHTML = '▶ Play';
-      document.getElementById('play-btn').classList.remove('active');
-    });
-    
-    audio.onended = () => {
-      if (!playing) return;
-      cancelSyncLoop();
-      prevText = slide.text;
-      if (current < slides.length - 1) {
-        setTimeout(() => {
-          if (playing) {
-            current++;
-            showSlide(current);
+
+      activeAudio.onended = () => {
+        if (!playing) return;
+        cancelSyncLoop();
+        prevText = slide.text;
+        if (current < slides.length - 1) {
+          setTimeout(() => {
+            if (playing) {
+              current++;
+              showSlide(current);
+            }
+          }, 500);
+        } else {
+          playing = false;
+          document.getElementById('play-btn').innerHTML = '▶ Play';
+          document.getElementById('play-btn').classList.remove('active');
+        }
+      };
+      return;
+    }
+
+    // Fallback: If not cached, fetch immediately
+    const voiceId = selectedVoiceIndex.split(":")[1];
+    const text = slide.text;
+    const url = `${BASE}/api/tts?text=${encodeURIComponent(text)}&voice=${voiceId}&speed=${speed}`;
+
+    setLoading(true);
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setLoading(false);
+        if (!playing) return;
+        if (data.error) {
+          showErr(data.error);
+          return;
+        }
+
+        const audio = new Audio("data:audio/wav;base64," + data.audio);
+        audio.playbackRate = 1.0;
+        activeAudio = audio;
+
+        const fetchedGroqStyles = data.groq_styles || null;
+        activeTokens = prepareWordTokens(slide.text, fetchedGroqStyles);
+
+        // Exact millisecond timing alignment markers
+        activeTimedTokens = data.timings.map((t, idx_token) => {
+          const originalToken = activeTokens[idx_token];
+          return {
+            ...t,
+            startTime: t.start,
+            endTime: t.end,
+            startIndex: originalToken ? originalToken.startIndex : 0,
+            endIndex: originalToken ? originalToken.endIndex : 0,
+            className: originalToken ? originalToken.className : 'w-plain'
+          };
+        });
+
+        // Save to cache so seeking or returning plays instantly!
+        slideAudioCache[idx] = { audio, timings: activeTimedTokens, groqStyles: fetchedGroqStyles };
+
+        // Update stage to display high-quality Groq styles
+        currEl.innerHTML = revealMode === 'full' ? renderFull(activeTokens) : renderWordByWord(activeTokens);
+
+        if (playing) {
+          syncStartTime = Date.now();
+          startSyncLoop();
+          audio.play().catch(err => {
+            console.warn("Audio playback blocked:", err);
+            playing = false;
+            document.getElementById('play-btn').innerHTML = '▶ Play';
+            document.getElementById('play-btn').classList.remove('active');
+          });
+        }
+
+        audio.onended = () => {
+          if (!playing) return;
+          cancelSyncLoop();
+          prevText = slide.text;
+          if (current < slides.length - 1) {
+            setTimeout(() => {
+              if (playing) {
+                current++;
+                showSlide(current);
+              }
+            }, 500);
+          } else {
+            playing = false;
+            document.getElementById('play-btn').innerHTML = '▶ Play';
+            document.getElementById('play-btn').classList.remove('active');
           }
-        }, 500);
-      } else {
+        };
+      })
+      .catch(err => {
+        setLoading(false);
+        showErr("Local Kokoro TTS backend server offline.");
         playing = false;
         document.getElementById('play-btn').innerHTML = '▶ Play';
         document.getElementById('play-btn').classList.remove('active');
-      }
-    };
-    
-    audio.onerror = () => {
-      showErr("Google Cloud Voice error. Falling back to local synthesizer.");
-      selectedVoiceIndex = 0;
-      showSlide(idx);
-    };
+      });
     return;
   }
 
+  // Premium Google Cloud Voice play logic with automatic 200-char chunking
+  if (selectedVoiceIndex === "google-premium") {
+    accumulatedMs = 0;
+    const textChunks = chunkTextForTTS(slide.text);
+    let chunkIdx = 0;
+
+    // Pre-calculate unified timeline
+    const totalWords = activeTokens.length;
+    const baseWpm = syncWpm * speed;
+    const estimatedTotalMs = (totalWords / baseWpm) * 60 * 1000;
+    activeTimedTokens = calculateWordTimings(activeTokens, estimatedTotalMs);
+
+    function playChunk(cIdx) {
+      if (!playing) return;
+      if (cIdx >= textChunks.length) {
+        cancelSyncLoop();
+        prevText = slide.text;
+        if (current < slides.length - 1) {
+          setTimeout(() => {
+            if (playing) {
+              current++;
+              showSlide(current);
+            }
+          }, 500);
+        } else {
+          playing = false;
+          document.getElementById('play-btn').innerHTML = '▶ Play';
+          document.getElementById('play-btn').classList.remove('active');
+        }
+        return;
+      }
+
+      chunkIdx = cIdx;
+      const chunkText = textChunks[cIdx];
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q=${encodeURIComponent(chunkText)}`;
+      const audio = new Audio(url);
+      audio.playbackRate = speed;
+      activeAudio = audio;
+
+      let initialized = false;
+      const initAudioPacing = () => {
+        if (initialized) return;
+        initialized = true;
+
+        if (playing) {
+          syncStartTime = Date.now() - accumulatedMs;
+          startSyncLoop();
+        }
+      };
+
+      audio.onloadedmetadata = initAudioPacing;
+      audio.oncanplay = initAudioPacing;
+      audio.onplay = initAudioPacing;
+
+      audio.play().then(() => {
+        initAudioPacing();
+      }).catch(err => {
+        console.warn("Audio playback blocked:", err);
+        playing = false;
+        document.getElementById('play-btn').innerHTML = '▶ Play';
+        document.getElementById('play-btn').classList.remove('active');
+      });
+
+      audio.onended = () => {
+        // Accumulate physical elapsed time of chunk
+        let chunkDur = audio.duration;
+        if (!chunkDur || isNaN(chunkDur) || chunkDur === Infinity) {
+          chunkDur = (chunkText.split(/\s+/).length / baseWpm) * 60;
+        }
+        accumulatedMs += chunkDur * 1000;
+        playChunk(cIdx + 1);
+      };
+
+      audio.onerror = () => {
+        showErr("Google Cloud Voice error. Falling back to local synthesizer.");
+        selectedVoiceIndex = 0;
+        showSlide(idx);
+      };
+    }
+
+    playChunk(0);
+    return;
+  }
+
+  // Native Local Voice Synthesis logic with startup latency compensation
   const utterance = new SpeechSynthesisUtterance(slide.text);
   utterance.rate = Math.min(Math.max(speed, 0.5), 2.0);
-  
+
   if(systemVoices && systemVoices[selectedVoiceIndex]) {
     utterance.voice = systemVoices[selectedVoiceIndex];
   }
-  
+
   currentUtterance = utterance;
   boundaryCount = 0;
   boundaryStart = Date.now();
-  
+
   const baseWpm = syncWpm * speed;
   const estimatedDurationMs = (activeTokens.length / baseWpm) * 60 * 1000;
   activeTimedTokens = calculateWordTimings(activeTokens, estimatedDurationMs);
+
+  let speechStarted = false;
+  let fallbackTimer = null;
 
   utterance.onboundary = (e) => {
     if (e.name === 'word') {
       const voice = systemVoices[selectedVoiceIndex];
       const isCloudVoice = voice && (!voice.localService || voice.name.includes('Google') || voice.name.includes('Microsoft') || voice.name.includes('Natural') || voice.name.includes('Premium'));
-      
+
       if (!isCloudVoice && isBoundaryBuggy) return;
-      
+
       if (!isCloudVoice) {
         boundaryCount++;
         const timeElapsed = Date.now() - boundaryStart;
@@ -684,7 +1493,14 @@ async function showSlide(idx){
           return;
         }
       }
-      
+
+      if (!speechStarted && playing) {
+        speechStarted = true;
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        syncStartTime = Date.now();
+        startSyncLoop();
+      }
+
       const charIndex = e.charIndex;
       let tokenIdx = -1;
       for (let i = 0; i < activeTimedTokens.length; i++) {
@@ -694,7 +1510,7 @@ async function showSlide(idx){
           break;
         }
       }
-      
+
       if (tokenIdx !== -1) {
         const token = activeTimedTokens[tokenIdx];
         syncStartTime = Date.now() - token.startTime;
@@ -703,31 +1519,39 @@ async function showSlide(idx){
   };
 
   utterance.onstart = () => {
+    speechStarted = false;
     boundaryCount = 0;
     boundaryStart = Date.now();
-    syncStartTime = Date.now();
-    if(playing){
-      startSyncLoop();
-    }
+
+    // Safety fallback: if no boundary event fires in 350ms, start loop to guarantee visual progress
+    fallbackTimer = setTimeout(() => {
+      if (!speechStarted && playing) {
+        speechStarted = true;
+        syncStartTime = Date.now();
+        startSyncLoop();
+      }
+    }, 350);
   };
 
   utterance.onend = () => {
-    if(!playing)return;
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (!playing) return;
     cancelSyncLoop();
-    prevText=slide.text;
-    if(current<slides.length-1){
-      setTimeout(()=>{if(playing){current++;showSlide(current);}},500);
+    prevText = slide.text;
+    if (current < slides.length - 1) {
+      setTimeout(() => { if (playing) { current++; showSlide(current); } }, 500);
     } else {
-      playing=false;
-      document.getElementById('play-btn').innerHTML='▶ Play';
+      playing = false;
+      document.getElementById('play-btn').innerHTML = '▶ Play';
       document.getElementById('play-btn').classList.remove('active');
     }
   };
 
   utterance.onerror = (e) => {
-    if(e.error !== 'interrupted') {
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (e.error !== 'interrupted') {
       showErr('Speech engine error.');
-      advanceAfterMs(slide.text,2000);
+      advanceAfterMs(slide.text, 2000);
     }
   };
 
@@ -746,9 +1570,123 @@ function handleWordClick(wordIdx) {
 
 function speakFromWordIndex(i) {
   stopLocalSpeech();
-  
+
   const token = activeTimedTokens[i] || activeTokens[i];
   if (!token) return;
+
+  // Local Kokoro Neural TTS click-to-speak logic
+  if (typeof selectedVoiceIndex === 'string' && selectedVoiceIndex.startsWith("local-kokoro:")) {
+    const cached = slideAudioCache[current];
+    // REAL-TIME PLAYBACK: If full audio is already cached, seek instantly!
+    if (cached && activeTimedTokens && activeTimedTokens[i]) {
+      console.log(`Realtime seeking to word index ${i} at ${activeTimedTokens[i].startTime}ms`);
+      activeAudio = cached.audio;
+      
+      const targetTime = activeTimedTokens[i].startTime / 1000;
+      activeAudio.currentTime = targetTime;
+
+      if (playing) {
+        syncStartTime = Date.now() - activeTimedTokens[i].startTime;
+        startSyncLoop();
+        activeAudio.play().catch(err => console.warn(err));
+      }
+
+      activeAudio.onended = () => {
+        if (!playing) return;
+        cancelSyncLoop();
+        prevText = slides[current].text;
+        if (current < slides.length - 1) {
+          setTimeout(() => {
+            if (playing) {
+              current++;
+              showSlide(current);
+            }
+          }, 500);
+        } else {
+          playing = false;
+          document.getElementById('play-btn').innerHTML = '▶ Play';
+          document.getElementById('play-btn').classList.remove('active');
+        }
+      };
+      return;
+    }
+
+    // Fallback: If not fully pre-cached, fetch remaining TTS sequence dynamically
+    const voiceId = selectedVoiceIndex.split(":")[1];
+    const fullText = slides[current].text;
+    const remainingText = fullText.substring(token.startIndex);
+    const url = `${BASE}/api/tts?text=${encodeURIComponent(remainingText)}&voice=${voiceId}&speed=${speed}`;
+
+    setLoading(true);
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setLoading(false);
+        if (!playing) return;
+        if (data.error) {
+          showErr(data.error);
+          return;
+        }
+
+        const audio = new Audio("data:audio/wav;base64," + data.audio);
+        audio.playbackRate = 1.0;
+        activeAudio = audio;
+
+        // Setup local alignment tokens starting from clicked index
+        const mappedTimings = data.timings.map((t, idx) => {
+          const originalToken = activeTokens[i + idx];
+          return {
+            ...t,
+            startTime: t.start,
+            endTime: t.end,
+            startIndex: originalToken ? originalToken.startIndex : 0,
+            endIndex: originalToken ? originalToken.endIndex : 0,
+            className: originalToken ? originalToken.className : 'w-plain'
+          };
+        });
+
+        // Shift timestamps relative to clicked token start offset
+        const baseShift = activeTimedTokens[i] ? activeTimedTokens[i].startTime : 0;
+        activeTimedTokens = activeTimedTokens.slice(0, i).concat(
+          mappedTimings.map(t => {
+            return {
+              ...t,
+              startTime: t.startTime + baseShift,
+              endTime: t.endTime + baseShift
+            };
+          })
+        );
+
+        if (playing) {
+          syncStartTime = Date.now() - baseShift;
+          startSyncLoop();
+          audio.play().catch(err => console.warn(err));
+        }
+
+        audio.onended = () => {
+          if (!playing) return;
+          cancelSyncLoop();
+          prevText = slides[current].text;
+          if (current < slides.length - 1) {
+            setTimeout(() => {
+              if (playing) {
+                current++;
+                showSlide(current);
+              }
+            }, 500);
+          } else {
+            playing = false;
+            document.getElementById('play-btn').innerHTML = '▶ Play';
+            document.getElementById('play-btn').classList.remove('active');
+          }
+        };
+      })
+      .catch(err => {
+        setLoading(false);
+        showErr("Local Kokoro TTS backend server offline.");
+      });
+    return;
+  }
 
   // Premium Google Cloud Voice click-to-speak logic
   if (selectedVoiceIndex === "google-premium") {
@@ -757,22 +1695,22 @@ function speakFromWordIndex(i) {
     const audio = new Audio(url);
     audio.playbackRate = speed;
     activeAudio = audio;
-    
+
     let initialized = false;
     const initAudioPacing = () => {
       if (initialized) return;
       initialized = true;
-      
+
       let duration = audio.duration;
       if (!duration || isNaN(duration) || duration === Infinity) {
         const baseWpm = syncWpm * speed;
         duration = (activeTokens.length / baseWpm) * 60;
       }
-      
+
       activeTimedTokens = calculateWordTimings(activeTokens, duration * 1000);
       const targetToken = activeTimedTokens[i];
       audio.currentTime = targetToken.startTime / 1000;
-      
+
       if (playing) {
         audio.play().then(() => {
           startSyncLoop();
@@ -781,17 +1719,17 @@ function speakFromWordIndex(i) {
         });
       }
     };
-    
+
     audio.onloadedmetadata = initAudioPacing;
     audio.oncanplay = initAudioPacing;
     audio.onplay = initAudioPacing;
-    
+
     audio.play().then(() => {
       initAudioPacing();
     }).catch(err => {
       console.warn("Audio play blocked:", err);
     });
-    
+
     audio.onended = () => {
       if (!playing) return;
       cancelSyncLoop();
@@ -809,32 +1747,32 @@ function speakFromWordIndex(i) {
         document.getElementById('play-btn').classList.remove('active');
       }
     };
-    
+
     audio.onerror = () => {
       showErr("Google Cloud Voice error.");
     };
     return;
   }
-  
+
   const textToSpeak = slides[current].text.substring(token.startIndex);
   const utterance = new SpeechSynthesisUtterance(textToSpeak);
   utterance.rate = Math.min(Math.max(speed, 0.5), 2.0);
-  
+
   if (systemVoices && systemVoices[selectedVoiceIndex]) {
     utterance.voice = systemVoices[selectedVoiceIndex];
   }
-  
+
   currentUtterance = utterance;
   boundaryCount = 0;
   boundaryStart = Date.now();
-  
+
   utterance.onboundary = (e) => {
     if (e.name === 'word') {
       const voice = systemVoices[selectedVoiceIndex];
       const isCloudVoice = voice && (!voice.localService || voice.name.includes('Google') || voice.name.includes('Microsoft') || voice.name.includes('Natural') || voice.name.includes('Premium'));
-      
+
       if (!isCloudVoice && isBoundaryBuggy) return;
-      
+
       if (!isCloudVoice) {
         boundaryCount++;
         const timeElapsed = Date.now() - boundaryStart;
@@ -844,7 +1782,7 @@ function speakFromWordIndex(i) {
           return;
         }
       }
-      
+
       const charIndex = e.charIndex + token.startIndex;
       let tokenIdx = -1;
       for (let idx = 0; idx < activeTimedTokens.length; idx++) {
@@ -854,14 +1792,14 @@ function speakFromWordIndex(i) {
           break;
         }
       }
-      
+
       if (tokenIdx !== -1) {
         const t = activeTimedTokens[tokenIdx];
         syncStartTime = Date.now() - t.startTime;
       }
     }
   };
-  
+
   utterance.onstart = () => {
     boundaryCount = 0;
     boundaryStart = Date.now();
@@ -870,7 +1808,7 @@ function speakFromWordIndex(i) {
       startSyncLoop();
     }
   };
-  
+
   utterance.onend = () => {
     if (!playing) return;
     cancelSyncLoop();
@@ -888,14 +1826,14 @@ function speakFromWordIndex(i) {
       document.getElementById('play-btn').classList.remove('active');
     }
   };
-  
+
   utterance.onerror = (e) => {
     if (e.error !== 'interrupted') {
       showErr('Speech engine error.');
       advanceAfterMs(slides[current].text, 2000);
     }
   };
-  
+
   window.speechSynthesis.speak(utterance);
 }
 
@@ -925,7 +1863,7 @@ function restartPresentation() {
   if (btn) btn.innerHTML = '👁 Focus Mode';
   current = 0;
   prevText = '';
-  playing = true; 
+  playing = true;
   document.getElementById('play-btn').innerHTML='⏸ Pause';
   document.getElementById('play-btn').classList.add('active');
   showSlide(current);
@@ -956,6 +1894,20 @@ function resetToInput(){
 }
 
 // Preset Text card loader
+function clearText() {
+  document.getElementById('raw-text').value = '';
+  localStorage.removeItem('rocket-rawText');
+  document.getElementById('raw-text').focus();
+  toggleClearButton();
+}
+
+function toggleClearButton() {
+  const btn = document.getElementById('clear-btn');
+  if (!btn) return;
+  const ta = document.getElementById('raw-text');
+  btn.style.display = ta && ta.value.trim().length > 0 ? '' : 'none';
+}
+
 function loadPreset(key) {
   const ta = document.getElementById('raw-text');
   if (ta) {
@@ -1089,7 +2041,7 @@ window.addEventListener('touchstart', (e) => {
 window.addEventListener('keydown', (e) => {
   if (focusMode) {
     toggleFocusMode();
-    e.stopPropagation();
+    e.stopImmediatePropagation();
     e.preventDefault();
   }
 }, true);
@@ -1099,10 +2051,10 @@ window.addEventListener('keydown', (e) => {
   const playerPanel = document.getElementById('player-panel');
   if (playerPanel && playerPanel.style.display === 'block') {
     if (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT') return;
-    
+
     switch(e.key) {
       case ' ':
-        e.preventDefault(); 
+        e.preventDefault();
         togglePlay();
         break;
       case 'ArrowRight':
@@ -1132,8 +2084,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedText = localStorage.getItem('rocket-rawText');
   if (savedText) {
     document.getElementById('raw-text').value = savedText;
-  } else {
-    document.getElementById('raw-text').value = presets.gettysburg;
   }
 
   // Restore speed options
@@ -1146,19 +2096,27 @@ window.addEventListener('DOMContentLoaded', () => {
   // Restore sync bias
   const savedSync = localStorage.getItem('rocket-syncWpm');
   if (savedSync) {
-    document.getElementById('sync-sel').value = savedSync;
+    const syncSel = document.getElementById('sync-sel');
+    if (syncSel) syncSel.value = savedSync;
     syncWpm = parseInt(savedSync);
   }
 
   // Track raw text input changes for recovery
   document.getElementById('raw-text').addEventListener('input', (e) => {
     localStorage.setItem('rocket-rawText', e.target.value);
+    toggleClearButton();
   });
-  
-  // Restore stage theme & history preferences
+
+  toggleClearButton();
+
+
+  // Restore stage theme, highlight style & history preferences
   applyStageTheme();
   applyHistoryPreference();
-  
+
+  const savedStyle = localStorage.getItem('rocket-highlightStyle') || 'highlight';
+  setHighlightStyle(savedStyle);
+
   setTimeout(loadVoices, 200);
 });
 </script>
